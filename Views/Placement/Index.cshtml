@@ -1,0 +1,41 @@
+@model PlacementDashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
+}
+<section class="heading">
+  <div><h1>Placement Dashboard</h1><p>Student placement overview and company-wise report</p></div>
+  <a class="btn" asp-action="Report" asp-route-status="@Model.StatusFilter" target="_blank">Open Printable Report / Save as PDF</a>
+</section>
+<section class="cards">
+  <article class="metric"><span>Total Students</span><strong>@Model.TotalStudents</strong></article>
+  <article class="metric"><span>Students Placed</span><strong>@Model.PlacedStudents</strong></article>
+  <article class="metric"><span>Companies</span><strong>@Model.TotalCompanies</strong></article>
+  <article class="metric"><span>Average Package (LPA)</span><strong>@Model.AveragePackage.ToString("0.00")</strong></article>
+</section>
+<section class="panel">
+  <div class="panelhead"><h2>Placement Records</h2>
+  <form method="get" asp-action="Index" class="filters">
+    <select name="status" aria-label="Filter by status">
+      <option value="All" selected="@(Model.StatusFilter == "All")">All statuses</option>
+      <option value="Placed" selected="@(Model.StatusFilter == "Placed")">Placed</option>
+      <option value="In Process" selected="@(Model.StatusFilter == "In Process")">In Process</option>
+      <option value="Not Placed" selected="@(Model.StatusFilter == "Not Placed")">Not Placed</option>
+    </select>
+    <button class="btn" type="submit">Filter</button>
+  </form></div>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Enrollment No.</th><th>Student Name</th><th>Department</th><th>Company</th><th>Job Role</th><th>Package (LPA)</th><th>Status</th><th>Date</th></tr></thead>
+    <tbody>
+    @foreach (var p in Model.Placements) {
+      <tr><td>@p.EnrollmentNo</td><td>@p.StudentName</td><td>@p.Department</td><td>@p.CompanyName</td><td>@p.JobRole</td><td>@p.PackageLPA.ToString("0.00")</td><td><span class="status">@p.PlacementStatus</span></td><td>@(p.PlacementDate?.ToString("dd-MMM-yyyy") ?? "—")</td></tr>
+    }
+    @if (!Model.Placements.Any()) { <tr><td colspan="8">No placement records found.</td></tr> }
+    </tbody>
+  </table></div>
+</section>
+<section class="panel">
+  <h2>Company-wise Placement Count</h2>
+  <div class="tablewrap"><table><thead><tr><th>Company</th><th>Job Role</th><th>Students Placed</th></tr></thead><tbody>
+  @foreach (var c in Model.Companies) { <tr><td>@c.CompanyName</td><td>@c.JobRole</td><td>@c.PlacedCount</td></tr> }
+  </tbody></table></div>
+</section>
